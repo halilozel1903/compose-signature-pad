@@ -1,0 +1,55 @@
+plugins {
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.maven.publish)
+}
+
+android {
+    namespace = "io.github.halilozel1903.signaturepad"
+    compileSdk = 37
+
+    defaultConfig {
+        minSdk = 24
+        consumerProguardFiles("consumer-rules.pro")
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    buildFeatures {
+        compose = true
+    }
+}
+
+kotlin {
+    explicitApi()
+}
+
+dependencies {
+    api(project(":signaturepad-core"))
+
+    implementation(platform(libs.androidx.compose.bom))
+    api(libs.androidx.compose.ui)
+    api(libs.androidx.compose.ui.graphics)
+    api(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    debugImplementation(libs.androidx.compose.ui.tooling)
+}
+
+mavenPublishing {
+    publishToMavenCentral()
+    // Sign only when a key is configured (Maven Central); JitPack and local builds stay unsigned.
+    if (providers.gradleProperty("signingInMemoryKey").isPresent) {
+        signAllPublications()
+    }
+    // JitPack serves artifacts under com.github.<user>.<repo>.
+    val jitpackGroup = "com.github.halilozel1903.compose-signature-pad".takeIf { System.getenv("JITPACK") == "true" }
+    coordinates(groupId = jitpackGroup, artifactId = "compose-signature-pad")
+    pom {
+        name.set("Compose Signature Pad")
+        description.set("Signature and sketch pad for Jetpack Compose, stylus-ready on tablets: pressure-aware strokes, undo, clear, export to Bitmap, PNG or SVG.")
+    }
+}
