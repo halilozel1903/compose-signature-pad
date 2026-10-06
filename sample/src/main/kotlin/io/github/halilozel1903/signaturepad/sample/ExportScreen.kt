@@ -28,6 +28,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.github.halilozel1903.signaturepad.SignaturePadState
@@ -82,7 +83,7 @@ fun ExportScreen(state: SignaturePadState) {
                 Code(exports.svg.lineSequence().take(5).joinToString("\n"), maxLines = 5)
             }
             SectionCard {
-                ExportTitle("Compact text", "${"%,d".format(exports.encoded.length)} characters · ${inkSummary(signature)}")
+                ExportTitle("Compact text", "${"%,d".format(exports.encoded.length)} characters")
                 Code(exports.encoded, maxLines = 3)
             }
         }
@@ -123,9 +124,18 @@ private class Exports(
 
 @Composable
 private fun ExportTitle(title: String, detail: String) {
+    // The title keeps its natural width; a long detail is shortened instead of squeezing it.
     Row(verticalAlignment = Alignment.CenterVertically) {
-        SectionLabel(title, Modifier.weight(1f))
-        Text(detail, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        SectionLabel(title, Modifier.padding(end = 12.dp))
+        Text(
+            detail,
+            modifier = Modifier.weight(1f),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.End,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
